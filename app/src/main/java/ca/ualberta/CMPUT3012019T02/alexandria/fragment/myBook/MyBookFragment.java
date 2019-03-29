@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,10 +23,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import ca.ualberta.CMPUT3012019T02.alexandria.R;
 import ca.ualberta.CMPUT3012019T02.alexandria.controller.BookController;
 import ca.ualberta.CMPUT3012019T02.alexandria.controller.ImageController;
 import ca.ualberta.CMPUT3012019T02.alexandria.activity.myBook.EditBookActivity;
+import ca.ualberta.CMPUT3012019T02.alexandria.model.user.OwnedBook;
 
 public class MyBookFragment extends Fragment {
 
@@ -55,6 +61,7 @@ public class MyBookFragment extends Fragment {
 
         extractData();
         setUI(rootView);
+        setImage(rootView);
         loadFragment(fragmentSelector());
 
         // toolbar
@@ -103,7 +110,6 @@ public class MyBookFragment extends Fragment {
     private void extractData() {
         Bundle arguments = getArguments();
 
-        coverId = arguments.getString("coverId");
         title = arguments.getString("title");
         author = arguments.getString("author");
         isbn = arguments.getString("isbn");
@@ -114,22 +120,11 @@ public class MyBookFragment extends Fragment {
         TextView tvTitle = v.findViewById(R.id.my_book_title);
         TextView tvAuthor = v.findViewById(R.id.my_book_author);
         TextView tvIsbn = v.findViewById(R.id.my_book_isbn);
-        ImageView ivCover = v.findViewById(R.id.my_book_cover);
         TextView tvContainerTitle = v.findViewById(R.id.my_book_container_title);
 
         tvTitle.setText(title);
         tvAuthor.setText(author);
         tvIsbn.setText(isbn);
-
-        imageController.getImage(coverId).handleAsync((result,error)->{
-            if(error==null){
-                ivCover.setImageBitmap(result);
-            }
-            else{
-                showError("Failed to get image from server");
-            }
-          return null;
-        });
 
         //This is needed due to the way the UI is designed
         //Will set the title for only the Recycler view
@@ -138,6 +133,27 @@ public class MyBookFragment extends Fragment {
             tvContainerTitle.setText(R.string.my_book_requests);
         }
 
+    }
+
+    private void setImage(View v) {
+        new Thread(() -> {
+            try {
+                OwnedBook myOwnedBook = BookController.getInstance().getMyOwnedBook(isbn).get(5, TimeUnit.SECONDS).get();
+                coverId = myOwnedBook.getImageId();
+                if (coverId != null) {
+                    Bitmap bitmap = imageController.getImage(coverId).get(5, TimeUnit.SECONDS);
+                    activity.runOnUiThread(() -> {
+                        ImageView ivCover = v.findViewById(R.id.my_book_cover);
+                        ivCover.setImageBitmap(bitmap);
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                activity.runOnUiThread(() -> {
+                    showError("Failed to get image from server");
+                });
+            }
+        }).start();
     }
 
     private Fragment fragmentSelector() {

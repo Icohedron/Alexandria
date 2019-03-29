@@ -1,7 +1,6 @@
 package ca.ualberta.CMPUT3012019T02.alexandria.fragment.myBook;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -185,15 +184,12 @@ public class MyBookUserListFragment extends Fragment {
             activity.runOnUiThread(() -> {
                 if (throwable == null) {
 
-                    // Successfully accepted the request
-                    // TODO: MyBookFragment.onStatusChange()
+                    getFragmentManager().popBackStack();
+                    Toast.makeText(activity, "Book request accepted", Toast.LENGTH_LONG).show();
 
                 } else {
                     throwable.printStackTrace();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Unable to accept request. Please try again later.");
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    Toast.makeText(activity, "Unable to accept request. Please try again later", Toast.LENGTH_LONG).show();
                 }
             });
             return null;
@@ -206,15 +202,12 @@ public class MyBookUserListFragment extends Fragment {
             activity.runOnUiThread(() -> {
                 if (throwable == null) {
 
-                    // Successfully declined the request
-                    // TODO: MyBookFragment.onStatusChange()
+                    getFragmentManager().popBackStack();
+                    Toast.makeText(activity, "Book request declined", Toast.LENGTH_LONG).show();
 
                 } else {
                     throwable.printStackTrace();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Unable to decline request. Please try again later.");
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    Toast.makeText(activity, "Unable to decline request. Please try again later", Toast.LENGTH_LONG).show();
                 }
             });
             return null;

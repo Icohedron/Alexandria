@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ca.ualberta.CMPUT3012019T02.alexandria.R;
 import ca.ualberta.CMPUT3012019T02.alexandria.activity.ISBNLookup;
@@ -265,7 +266,8 @@ public class MyBookTransactionFragment extends Fragment {
                         activity.runOnUiThread(() -> {
                             if (throwable1 == null) {
 
-                                // Completed successfully
+                                getFragmentManager().popBackStack();
+                                Toast.makeText(activity, "Book borrowed", Toast.LENGTH_LONG).show();
 
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -278,21 +280,15 @@ public class MyBookTransactionFragment extends Fragment {
                     });
 
                 } else {
+                    throwable.printStackTrace();
                     activity.runOnUiThread(() -> {
-                        throwable.printStackTrace();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setMessage("Was not able to scan ISBN. Please try again later.");
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+                        Toast.makeText(activity, "Was not able to scan ISBN", Toast.LENGTH_LONG).show();
                     });
                 }
                 return null;
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage("Scanned ISBN does not match the book you are returning");
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            Toast.makeText(activity, "Scanned ISBN does not match", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -305,7 +301,8 @@ public class MyBookTransactionFragment extends Fragment {
                         activity.runOnUiThread(() -> {
                             if (throwable1 == null) {
 
-                                // Completed successfully
+                                getFragmentManager().popBackStack();
+                                Toast.makeText(activity, "Book returned", Toast.LENGTH_LONG).show();
 
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -318,21 +315,15 @@ public class MyBookTransactionFragment extends Fragment {
                     });
 
                 } else {
+                    throwable.printStackTrace();
                     activity.runOnUiThread(() -> {
-                        throwable.printStackTrace();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setMessage("Was not able to scan ISBN. Please try again later.");
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+                        Toast.makeText(activity, "Was not able to scan ISBN", Toast.LENGTH_LONG).show();
                     });
                 }
                 return null;
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage("Scanned ISBN does not match the book you are returning");
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            Toast.makeText(activity, "Scanned ISBN does not match", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -341,15 +332,12 @@ public class MyBookTransactionFragment extends Fragment {
             activity.runOnUiThread(() -> {
                 if (throwable == null) {
 
-                    // Successfully declined the request
-                    // TODO: MyBookFragment.onStatusChange()
+                    getFragmentManager().popBackStack();
+                    Toast.makeText(activity, "Book order cancelled", Toast.LENGTH_LONG).show();
 
                 } else {
                     throwable.printStackTrace();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Unable to cancel order. Please try again later.");
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    Toast.makeText(activity, "Unable to cancel order. Please try again later", Toast.LENGTH_LONG).show();
                 }
             });
             return null;

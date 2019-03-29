@@ -34,6 +34,7 @@ import ca.ualberta.CMPUT3012019T02.alexandria.activity.ViewUserProfileActivity;
 import ca.ualberta.CMPUT3012019T02.alexandria.controller.ImageController;
 import ca.ualberta.CMPUT3012019T02.alexandria.controller.SearchController;
 import ca.ualberta.CMPUT3012019T02.alexandria.controller.UserController;
+import ca.ualberta.CMPUT3012019T02.alexandria.fragment.myBook.MyBookFragment;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -255,11 +256,15 @@ public class UserBookFragment extends Fragment {
 
     }
 
-    //TODO Implement
     //To be called when the status changes in order to reload the page
     private void onStatusChange() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.detach(this).attach(this).commit();
+        Fragment frag = getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (frag instanceof MyBookFragment) {
+            FragmentTransaction fragTransaction = (getActivity()).getSupportFragmentManager().beginTransaction();
+            fragTransaction.detach(frag);
+            fragTransaction.attach(frag);
+            fragTransaction.commit();
+        }
     }
 
     private final View.OnClickListener mListener = (View v) -> {
@@ -339,14 +344,15 @@ public class UserBookFragment extends Fragment {
             activity.runOnUiThread(() -> {
                 if (throwable == null) {
 
-                    onStatusChange();
+                    getFragmentManager().popBackStack();
+                    Toast.makeText(activity, "Book request sent", Toast.LENGTH_LONG).show();
 
                 } else {
                     throwable.printStackTrace();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Request failed. Please try again later.");
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    throwable.printStackTrace();
+                    activity.runOnUiThread(() -> {
+                        Toast.makeText(activity, "Request failed. Try again later", Toast.LENGTH_LONG).show();
+                    });
                 }
             });
             return null;
@@ -358,14 +364,14 @@ public class UserBookFragment extends Fragment {
             activity.runOnUiThread(() -> {
                 if (throwable == null) {
 
-                    onStatusChange();
+                    getFragmentManager().popBackStack();
+                    Toast.makeText(activity, "Book request cancelled", Toast.LENGTH_LONG).show();
 
                 } else {
                     throwable.printStackTrace();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Request could not be cancelled. Please try again later.");
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    activity.runOnUiThread(() -> {
+                        Toast.makeText(activity, "Request cancel failed. Try again later", Toast.LENGTH_LONG).show();
+                    });
                 }
             });
             return null;
@@ -381,7 +387,8 @@ public class UserBookFragment extends Fragment {
                         activity.runOnUiThread(() -> {
                             if (throwable1 == null) {
 
-                                onStatusChange();
+                                getFragmentManager().popBackStack();
+                                Toast.makeText(activity, "Book borrowed", Toast.LENGTH_LONG).show();
 
                             } else {
                                 throwable1.printStackTrace();
@@ -395,21 +402,15 @@ public class UserBookFragment extends Fragment {
                     });
 
                 } else {
-                    getActivity().runOnUiThread(() -> {
-                        throwable.printStackTrace();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setMessage("Was not able to scan ISBN. Please try again later.");
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+                    throwable.printStackTrace();
+                    activity.runOnUiThread(() -> {
+                        Toast.makeText(activity, "Was not able to scan ISBN", Toast.LENGTH_LONG).show();
                     });
                 }
                 return null;
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage("Scanned ISBN does not match the book you are returning");
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            Toast.makeText(activity, "Scanned ISBN does not match", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -422,7 +423,8 @@ public class UserBookFragment extends Fragment {
                         activity.runOnUiThread(() -> {
                             if (throwable1 == null) {
 
-                                onStatusChange();
+                                getFragmentManager().popBackStack();
+                                Toast.makeText(activity, "Book returned", Toast.LENGTH_LONG).show();
 
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -435,21 +437,15 @@ public class UserBookFragment extends Fragment {
                     });
 
                 } else {
+                    throwable.printStackTrace();
                     activity.runOnUiThread(() -> {
-                        throwable.printStackTrace();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setMessage("Was not able to scan ISBN. Please try again later.");
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+                        Toast.makeText(activity, "Was not able to scan ISBN", Toast.LENGTH_LONG).show();
                     });
                 }
                 return null;
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage("Scanned ISBN does not match the book you are returning");
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            Toast.makeText(activity, "Scanned ISBN does not match", Toast.LENGTH_LONG).show();
         }
     }
 

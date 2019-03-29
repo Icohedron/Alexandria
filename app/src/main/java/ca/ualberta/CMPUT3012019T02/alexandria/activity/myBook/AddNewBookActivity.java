@@ -258,10 +258,25 @@ public class AddNewBookActivity extends AppCompatActivity {
         saveBook();
     }
 
+    private void fillEmptyFields(Book b) {
+        if (title.trim().isEmpty()) {
+            title = b.getTitle();
+        }
+        if (author.trim().isEmpty()) {
+            author = b.getAuthor();
+        }
+    }
+
     /**
      * save book with current details
      */
     private void saveBook() {
+
+        if (isbn.length() != 10 && isbn.length() != 13) {
+            showError("Invalid ISBN");
+            return;
+        }
+
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Adding book...");
         progressDialog.show();
@@ -296,7 +311,7 @@ public class AddNewBookActivity extends AppCompatActivity {
             if (bookOptional.isPresent()) {
 
                 // if the book already exists, just update the information
-
+                fillEmptyFields(bookOptional.get());
                 book = new Book(isbn, title, author, description, bookOptional.get().getImageId());
 
                 try {
@@ -318,11 +333,13 @@ public class AddNewBookActivity extends AppCompatActivity {
                 if (searchedBook == null) {
                     try {
                         searchedBook = SearchController.getInstance().searchIsbn(isbn).get(5, TimeUnit.SECONDS);
+                        fillEmptyFields(searchedBook);
                         book = new Book(isbn, title, author, description, searchedBook.getImageId());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
+                    fillEmptyFields(searchedBook);
                     book = new Book(isbn, title, author, description, searchedBook.getImageId());
                 }
 
@@ -339,6 +356,22 @@ public class AddNewBookActivity extends AppCompatActivity {
                     return;
                 }
 
+            }
+
+            if (author.trim().isEmpty()) {
+                runOnUiThread(() -> {
+                    showError("Author can not be empty");
+                    progressDialog.dismiss();
+                });
+                return;
+            }
+
+            if (title.trim().isEmpty()) {
+                runOnUiThread(() -> {
+                    showError("Title can not be empty");
+                    progressDialog.dismiss();
+                });
+                return;
             }
 
             // Add owned book
